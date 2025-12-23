@@ -1,0 +1,170 @@
+type Mutation {
+  ai_twin_reply(
+    input: TwinInput!
+  ): TwinOutput
+}
+
+type Mutation {
+  analyze_mood(
+    input: MoodInput!
+  ): MoodOutput
+}
+
+type Mutation {
+  design_theme(
+    input: ThemeInput!
+  ): ThemeOutput
+}
+
+type Mutation {
+  generate_summary(
+    input: SummaryInput!
+  ): SummaryOutput
+}
+
+type Mutation {
+  login_user(
+    input: LoginInput!
+  ): LoginOutput
+}
+
+type Mutation {
+  matthu_query(
+    input: MatthuInput!
+  ): MatthuOutput
+}
+
+type Mutation {
+  register_user(
+    input: RegisterInput!
+  ): RegisterOutput
+}
+
+input RegisterInput {
+  email: String!
+  display_name: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input MoodInput {
+  message: String!
+}
+
+input SummaryInput {
+  group_id: uuid!
+  from_date: String!
+  to_date: String!
+}
+
+input TwinInput {
+  group_id: uuid!
+}
+
+input ThemeInput {
+  description: String!
+}
+
+input MatthuInput {
+  prompt: String!
+  group_id: uuid
+}
+
+type RegisterOutput {
+  user_id: uuid!
+}
+
+type LoginOutput {
+  token: String!
+}
+
+type MoodOutput {
+  mood: String!
+  confidence: Float!
+}
+
+type SummaryOutput {
+  summary: String!
+}
+
+type TwinOutput {
+  reply: String!
+}
+
+type ThemeOutput {
+  css: String!
+}
+
+type MatthuOutput {
+  answer: String!
+}
+
+type Mutation {
+  arena(
+    input: ArenaInput!
+  ): ArenaOutput
+}
+
+input ArenaInput {
+  group_id: uuid!
+  members: [uuid!]!
+}
+
+type ArenaOutput {
+  challenger_id: uuid!
+  player_id: uuid!
+}
+type Mutation {
+  create_group(
+    input: CreateGroupInput!
+  ): CreateGroupOutput
+}
+
+type Mutation {
+  add_members(
+    input: AddMembersInput!
+  ): AddMembersOutput
+}
+
+type Query {
+  load_app_data: LoadDataOutput
+}
+
+input CreateGroupInput {
+  name: String!
+  members: [uuid!]
+}
+
+input AddMembersInput {
+  group_id: uuid!
+  members: [uuid!]!
+}
+
+type CreateGroupOutput {
+  group_id: uuid!
+}
+
+type AddMembersOutput {
+  added_count: Int!
+}
+
+type LoadDataOutput {
+  user_profile: UserProfile!
+  groups: [GroupSummary!]!
+}
+
+type UserProfile {
+  id: uuid!
+  email: String!
+  display_name: String
+}
+
+type GroupSummary {
+  id: uuid!
+  name: String!
+  unread_count: Int
+}

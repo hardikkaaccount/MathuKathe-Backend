@@ -1,0 +1,41 @@
+table:
+  name: groups
+  schema: public
+object_relationships:
+  - name: creator
+    using:
+      foreign_key_constraint_on: created_by
+array_relationships:
+  - name: members
+    using:
+      foreign_key_constraint_on:
+        column: group_id
+        table:
+          name: group_members
+          schema: public
+  - name: messages
+    using:
+      foreign_key_constraint_on:
+        column: group_id
+        table:
+          name: messages
+          schema: public
+insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns:
+        - name
+        - description
+        - created_by
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+        - name
+        - description
+        - created_by
+        - created_at
+      filter: {}
+      allow_aggregations: true

@@ -1,0 +1,6 @@
+- "!include public_group_members.yaml"
+- "!include public_groups.yaml"
+- "!include public_messages.yaml"
+- "!include public_moods.yaml"
+- "!include public_themes.yaml"
+- "!include public_users.yaml"

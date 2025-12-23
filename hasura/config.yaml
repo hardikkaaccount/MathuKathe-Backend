@@ -1,0 +1,7 @@
+version: 3
+endpoint: https://picked-quetzal-24.hasura.app
+admin_secret: "1GaXzp5u2iR5MAeoyF0ZIiblDTpPddhmtBl15cB5lMz62KnKx7ZTIGscTqRUS2W7"
+metadata_directory: metadata
+actions:
+  kind: synchronous
+  handler_webhook_baseurl: http://localhost:3000

@@ -1,0 +1,100 @@
+actions:
+  - name: ai_twin_reply
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/twin
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: analyze_mood
+    definition:
+      kind: synchronous
+      handler: https://peevish-unberouged-campbell.ngrok-free.dev/actions/mood
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: design_theme
+    definition:
+      kind: synchronous
+      handler: https://peevish-unberouged-campbell.ngrok-free.dev/actions/theme
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: generate_summary
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/summary
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: login_user
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/login
+      forward_client_headers: true
+    permissions:
+      - role: anonymous
+      - role: user
+  - name: matthu_query
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/matthu
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: register_user
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/register
+      forward_client_headers: true
+    permissions:
+      - role: anonymous
+      - role: user
+  - name: arena
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/arena
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: create_group
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/create_group
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: add_members
+    definition:
+      kind: synchronous
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/add_members
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: load_app_data
+    definition:
+      kind: synchronous
+      type: query
+      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/load_app_data
+      forward_client_headers: true
+    permissions:
+      - role: user
+custom_types:
+  enums: []
+  input_objects:
+    - name: RegisterInput
+    - name: LoginInput
+    - name: MoodInput
+    - name: SummaryInput
+    - name: TwinInput
+    - name: ThemeInput
+    - name: MatthuInput
+  objects:
+    - name: RegisterOutput
+    - name: LoginOutput
+    - name: MoodOutput
+    - name: SummaryOutput
+    - name: TwinOutput
+    - name: ThemeOutput
+    - name: MatthuOutput
+  scalars: []

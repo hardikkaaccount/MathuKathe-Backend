@@ -1,0 +1,8 @@
+- name: default
+  kind: postgres
+  configuration:
+    connection_info:
+      database_url: postgresql://neondb_owner:npg_T31EGyvzXSUg@ep-polished-waterfall-ah5gqpyc-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      isolation_level: read-committed
+      use_prepared_statements: false
+  tables: "!include default/tables/tables.yaml"
