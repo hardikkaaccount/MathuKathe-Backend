@@ -1,47 +1,28 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { z } from 'zod';
 import { User } from '../models/user';
-import { hashPassword } from '../utils/password';
+import { apiHandler } from '../middlewares/apiHandler';
 
-export const handler: APIGatewayProxyHandler = async (event) => {
-    try {
-        const { input } = JSON.parse(event.body || '{}');
+// Define the schema
+const registerSchema = z.object({
+    email: z.string().email(),
+    display_name: z.string().min(1, "Display name is required"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
-        // Hasura wraps arguments in an 'input' object, and our argument is named 'input'
-        const { email, display_name, password } = input?.input || {};
+export const handler = apiHandler({ schema: registerSchema }, async (event, context, { body }) => {
+    const { email, display_name, password } = body;
 
-        if (!email || !display_name || !password) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Missing required fields: email, display_name, password' }),
-            };
-        }
+    // Business Logic via Model
+    const user = await User.register({
+        email,
+        display_name,
+        password
+    });
 
-        const hashedPassword = await hashPassword(password);
-
-        const user = await User.create({
-            email,
-            display_name,
-            password_hash: hashedPassword,
-        });
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                user_id: user.id,
-            }),
-        };
-    } catch (error: any) {
-        console.error('Error creating user:', error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: error.message || 'Internal Server Error',
-                stack: error.stack,
-                debug: {
-                    hasura_id_exists: !!process.env.HASURA_GRAPHQL_ID,
-                    hasura_secret_exists: !!process.env.HASURA_ADMIN_SECRET,
-                },
-            }),
-        };
-    }
-};
+    return {
+        statusCode: 200,
+        body: JSON.stringify({
+            user_id: user.id,
+        }),
+    };
+});

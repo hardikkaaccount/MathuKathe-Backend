@@ -4,16 +4,18 @@ import { hashPassword } from '../utils/password';
 export async function testRegistration() {
     const randomId: string = Math.random().toString(36).substring(7);
     const email: string = `test_${randomId}@example.com`;
-    const passwordHash: string = await hashPassword(`hashed_secret_${randomId}`);
+    const plainPassword = `secret_${randomId}`; // Define plainPassword for User.register
+    const passwordHash: string = await hashPassword(plainPassword); // Keep passwordHash for potential other uses or if User.register still needs it, but the instruction implies plain password.
     const displayName: string = `Tester ${randomId}`;
 
     console.log(`Attempting to create user: ${email}`);
 
+    // 3. Call User.register
     try {
-        const user = await User.create({
+        const user = await User.register({
             email,
             display_name: displayName,
-            password_hash: passwordHash
+            password: plainPassword // Use the plain password for User.register
         });
 
         console.log('User created:', user);

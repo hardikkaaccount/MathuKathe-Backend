@@ -1,48 +1,29 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
-import { generateResponse } from '../utils/gemini';
+import { z } from 'zod';
 import { Message } from '../models/message';
+import { MatthuModel } from '../models/matthu';
+import { apiHandler } from '../middlewares/apiHandler';
 
-export const handler: APIGatewayProxyHandler = async (event) => {
-    try {
-        const { input } = JSON.parse(event.body || '{}');
-        const { prompt, group_id } = input?.input || {};
+// Define the schema
+const matthuSchema = z.object({
+    prompt: z.string().min(1, "Prompt is required"),
+    group_id: z.string().uuid().optional(),
+});
 
-        if (!prompt) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Missing required field: prompt' }),
-            };
-        }
+export const handler = apiHandler({ schema: matthuSchema }, async (event, context, { body }) => {
+    const { prompt, group_id } = body;
 
-        let fullPrompt = prompt;
-
-        if (group_id) {
-            console.log(`Fetching context for group ${group_id}`);
-            const recentMessages = await Message.fetchRecent(group_id, 10);
-
-            if (recentMessages.length > 0) {
-                const context = recentMessages.map(msg =>
-                    `${msg.sender.display_name}: ${msg.content}`
-                ).join('\n');
-
-                fullPrompt = `Context from recent chat history:\n${context}\n\nUser Question: ${prompt}`;
-            }
-        }
-
-        const answer = await generateResponse(fullPrompt);
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ answer }),
-        };
-
-    } catch (error: any) {
-        console.error('Error handling matthu query:', error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: error.message || 'Internal Server Error',
-            }),
-        };
+    // Data Fetching (if needed)
+    let recentMessages: any[] = [];
+    if (group_id) {
+        console.log(`Fetching context for group ${group_id}`);
+        recentMessages = await Message.fetchRecent(group_id, 10);
     }
-};
+
+    // Business Logic
+    const answer = await MatthuModel.answerQuestion(prompt, recentMessages);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ answer }),
+    };
+});

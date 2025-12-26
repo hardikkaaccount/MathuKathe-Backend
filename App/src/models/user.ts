@@ -1,63 +1,68 @@
 import { execute } from '../utils/hasura';
-
-const INSERT_USER_MUTATION = `
-  mutation InsertUser($email: String!, $display_name: String!, $password_hash: String!) {
-    insert_users_one(object: {
-      email: $email,
-      display_name: $display_name,
-      password_hash: $password_hash
-    }) {
-      id
-      password_hash
-    }
-  }
-`;
-
-const GET_USER_BY_EMAIL_QUERY = `
-  query GetUserByEmail($email: String!) {
-    users(where: { email: { _eq: $email } }) {
-      id
-      password_hash
-    }
-  }
-`;
-
-interface CreateUserArgs {
-  email: string;
-  display_name: string;
-  password_hash: string;
-}
-
-interface UserData {
-  id: string;
-  password_hash: string;
-}
-
-interface InsertUserResponse {
-  insert_users_one: UserData;
-}
-
-interface GetUsersResponse {
-  users: UserData[];
-}
+import { INSERT_USER_MUTATION, GET_USER_BY_EMAIL_QUERY, GET_USER_BY_ID_QUERY } from '../queries/user';
+import { UserData, LoginInput, RegisterInput, InsertUserResponse, GetUsersResponse } from '../types/user';
+import { hashPassword, verifyPassword } from '../utils/password';
+import * as jwt from 'jsonwebtoken';
 
 export class User {
-  static async create({ email, display_name, password_hash }: CreateUserArgs): Promise<UserData> {
+  /**
+   * Registers a new user with hashed password.
+   */
+  static async register({ email, display_name, password }: RegisterInput): Promise<UserData> {
+    const hashedPassword = await hashPassword(password);
+
     const data = await execute<InsertUserResponse>(INSERT_USER_MUTATION, {
       email,
       display_name,
-      password_hash
+      password_hash: hashedPassword
     });
+
     return data.insert_users_one;
   }
 
-  static async findByEmail(email: string): Promise<UserData | null> {
+  /**
+   * Authenticates a user. Returns UserData if successful, null otherwise.
+   */
+  static async login({ email, password }: LoginInput): Promise<UserData | null> {
     const data = await execute<GetUsersResponse>(
       GET_USER_BY_EMAIL_QUERY,
-      {
-        email,
-      }
+      { email }
     );
-    return data.users[0] || null;
+
+    const user = data.users[0];
+    if (!user) {
+      return null;
+    }
+
+    const isValid = await verifyPassword(password, user.password_hash);
+    if (!isValid) {
+      return null;
+    }
+
+    return user;
+  }
+
+  /**
+   * Generates a JWT for the user.
+   */
+  static generateToken(user: UserData): string {
+    const HASURA_GRAPHQL_JWT_SECRET = process.env.HASURA_JWT_SECRET || 'secret';
+
+    return jwt.sign(
+      {
+        'https://hasura.io/jwt/claims': {
+          'x-hasura-allowed-roles': ['user'],
+          'x-hasura-default-role': 'user',
+          'x-hasura-user-id': user.id,
+        },
+      },
+      HASURA_GRAPHQL_JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+  }
+  static async getProfile(userId: string): Promise<UserData | null> {
+    const data = await execute<{ users_by_pk: UserData }>(GET_USER_BY_ID_QUERY, { id: userId });
+    return data.users_by_pk || null;
   }
 }
+

@@ -1,48 +1,6 @@
 import { execute } from '../utils/hasura';
-
-const CREATE_GROUP_MUTATION = `
-    mutation CreateGroup($name: String!, $created_by: uuid!) {
-        insert_groups_one(object: {name: $name, created_by: $created_by}) {
-            id
-        }
-    }
-`;
-
-const ADD_MEMBERS_MUTATION = `
-    mutation AddMembers($objects: [group_members_insert_input!]!) {
-        insert_group_members(objects: $objects) {
-            affected_rows
-        }
-    }
-`;
-
-const GET_USER_GROUPS_QUERY = `
-    query GetUserGroups($user_id: uuid!) {
-        group_members(where: {user_id: {_eq: $user_id}}) {
-            group {
-                id
-                name
-            }
-        }
-    }
-`;
-
-interface CreateGroupResponse {
-    insert_groups_one: { id: string };
-}
-
-interface AddMembersResponse {
-    insert_group_members: { affected_rows: number };
-}
-
-interface GetUserGroupsResponse {
-    group_members: {
-        group: {
-            id: string;
-            name: string;
-        }
-    }[];
-}
+import { CREATE_GROUP_MUTATION, ADD_MEMBERS_MUTATION, GET_USER_GROUPS_QUERY } from '../queries/group';
+import { CreateGroupResponse, AddMembersResponse, GetUserGroupsResponse } from '../types/group';
 
 export class Group {
     static async create(name: string, createdBy: string): Promise<string> {

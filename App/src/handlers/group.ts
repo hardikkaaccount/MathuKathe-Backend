@@ -1,57 +1,46 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { z } from 'zod';
 import { Group } from '../models/group';
+import { apiHandler } from '../middlewares/apiHandler';
 
-export const createGroup: APIGatewayProxyHandler = async (event) => {
-    try {
-        const { input } = JSON.parse(event.body || '{}');
-        const { name, members } = input?.input || {};
-        const { session_variables } = JSON.parse(event.body || '{}');
-        const userId = session_variables?.['x-hasura-user-id'];
+// Define schemas
+const createGroupSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    members: z.array(z.string()).optional(),
+});
 
-        if (!name) {
-            return { statusCode: 400, body: JSON.stringify({ message: "Name is required" }) };
-        }
-        if (!userId) {
-            return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
-        }
+const addMembersSchema = z.object({
+    group_id: z.string().uuid(),
+    members: z.array(z.string()).min(1, "At least one member is required"),
+});
 
-        // 1. Create Group
-        const groupId = await Group.create(name, userId);
+export const createGroup = apiHandler({ schema: createGroupSchema, requireAuth: true }, async (event, context, { body, user_id }) => {
+    const { name, members } = body;
+    // user_id is guaranteed by requireAuth: true
+    const creatorId = user_id!;
 
-        // 2. Add creator and other members
-        const membersToAdd = new Set<string>([userId]);
-        if (members && Array.isArray(members)) {
-            members.forEach((m: string) => membersToAdd.add(m));
-        }
+    // 1. Create Group
+    const groupId = await Group.create(name, creatorId);
 
-        await Group.addMembers(groupId, Array.from(membersToAdd));
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ group_id: groupId })
-        };
-
-    } catch (e: any) {
-        return { statusCode: 500, body: JSON.stringify({ message: e.message }) };
+    // 2. Add members
+    const membersToAdd = new Set<string>([creatorId]);
+    if (members && Array.isArray(members)) {
+        members.forEach((m: string) => membersToAdd.add(m));
     }
-};
+    await Group.addMembers(groupId, Array.from(membersToAdd));
 
-export const addMembers: APIGatewayProxyHandler = async (event) => {
-    try {
-        const { input } = JSON.parse(event.body || '{}');
-        const { group_id, members } = input?.input || {};
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ group_id: groupId })
+    };
+});
 
-        if (!group_id || !members || !Array.isArray(members)) {
-            return { statusCode: 400, body: JSON.stringify({ message: "Invalid input" }) };
-        }
+export const addMembers = apiHandler({ schema: addMembersSchema }, async (event, context, { body }) => {
+    const { group_id, members } = body;
 
-        const addedCount = await Group.addMembers(group_id, members);
+    const addedCount = await Group.addMembers(group_id, members);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ added_count: addedCount })
-        };
-    } catch (e: any) {
-        return { statusCode: 500, body: JSON.stringify({ message: e.message }) };
-    }
-};
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ added_count: addedCount })
+    };
+});

@@ -1,47 +1,37 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { z } from 'zod';
 import { Message } from '../models/message';
-import { generateSummary } from '../utils/gemini';
+import { SummaryModel } from '../models/summary';
+import { apiHandler } from '../middlewares/apiHandler';
 
-export const handler: APIGatewayProxyHandler = async (event) => {
-    try {
-        const { input } = JSON.parse(event.body || '{}');
-        const { group_id, from_date, to_date } = input?.input || {};
+// Define the schema
+const summarySchema = z.object({
+    group_id: z.string().uuid(),
+    from_date: z.string().datetime(),
+    to_date: z.string().datetime(),
+});
 
-        if (!group_id || !from_date || !to_date) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Missing required fields: group_id, from_date, to_date' }),
-            };
-        }
+export const handler = apiHandler({ schema: summarySchema }, async (event, context, { body }) => {
+    const { group_id, from_date, to_date } = body;
 
-        const messages = await Message.fetchByGroupAndDateRange(group_id, from_date, to_date);
+    // Data Fetching via Model
+    const messages = await Message.fetchByGroupAndDateRange(group_id, from_date, to_date);
 
-        if (messages.length === 0) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ summary: 'No messages found in the specified period.' }),
-            };
-        }
-
-        // Format messages for the AI
-        const formattedChat = messages.map(msg =>
-            `${msg.created_at} - ${msg.sender.display_name}: ${msg.content}`
-        ).join('\n');
-
-        const summary = await generateSummary(formattedChat);
-
+    if (messages.length === 0) {
         return {
             statusCode: 200,
-            body: JSON.stringify({ summary }),
-        };
-
-    } catch (error: any) {
-        console.error('Error generating summary:', error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: error.message || 'Internal Server Error',
-            }),
+            body: JSON.stringify({ summary: 'No messages found in the specified period.' }),
         };
     }
-};
+
+    const formattedChat = messages.map(msg =>
+        `${msg.created_at} - ${msg.sender.display_name}: ${msg.content}`
+    ).join('\n');
+
+    // Call Summary Logic
+    const summary = await SummaryModel.generate(formattedChat);
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ summary }),
+    };
+});
