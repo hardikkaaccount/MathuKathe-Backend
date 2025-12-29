@@ -1,13 +1,25 @@
 type Mutation {
+  add_members(
+    input: AddMembersInput!
+  ): AddMembersOutput
+}
+
+type Mutation {
   ai_twin_reply(
     input: TwinInput!
   ): TwinOutput
 }
 
 type Mutation {
-  analyze_mood(
-    input: MoodInput!
-  ): MoodOutput
+  arena(
+    input: ArenaInput!
+  ): ArenaOutput
+}
+
+type Mutation {
+  create_group(
+    input: CreateGroupInput!
+  ): CreateGroupOutput
 }
 
 type Mutation {
@@ -20,6 +32,10 @@ type Mutation {
   generate_summary(
     input: SummaryInput!
   ): SummaryOutput
+}
+
+type Query {
+  load_app_data: LoadDataOutput
 }
 
 type Mutation {
@@ -51,10 +67,6 @@ input LoginInput {
   password: String!
 }
 
-input MoodInput {
-  message: String!
-}
-
 input SummaryInput {
   group_id: uuid!
   from_date: String!
@@ -72,6 +84,21 @@ input ThemeInput {
 input MatthuInput {
   prompt: String!
   group_id: uuid
+}
+
+input ArenaInput {
+  group_id: uuid!
+  members: [uuid!]!
+}
+
+input CreateGroupInput {
+  name: String!
+  members: [uuid!]
+}
+
+input AddMembersInput {
+  group_id: uuid!
+  members: [uuid!]!
 }
 
 type RegisterOutput {
@@ -103,45 +130,9 @@ type MatthuOutput {
   answer: String!
 }
 
-type Mutation {
-  arena(
-    input: ArenaInput!
-  ): ArenaOutput
-}
-
-input ArenaInput {
-  group_id: uuid!
-  members: [uuid!]!
-}
-
 type ArenaOutput {
   challenger_id: uuid!
   player_id: uuid!
-}
-type Mutation {
-  create_group(
-    input: CreateGroupInput!
-  ): CreateGroupOutput
-}
-
-type Mutation {
-  add_members(
-    input: AddMembersInput!
-  ): AddMembersOutput
-}
-
-type Query {
-  load_app_data: LoadDataOutput
-}
-
-input CreateGroupInput {
-  name: String!
-  members: [uuid!]
-}
-
-input AddMembersInput {
-  group_id: uuid!
-  members: [uuid!]!
 }
 
 type CreateGroupOutput {
@@ -168,3 +159,4 @@ type GroupSummary {
   name: String!
   unread_count: Int
 }
+

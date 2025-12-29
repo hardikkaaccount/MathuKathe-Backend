@@ -1,36 +1,57 @@
 actions:
-  - name: ai_twin_reply
+  - name: add_members
     definition:
       kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/twin
+      handler: '{{ACTION_BASE_URL}}/add_members'
       forward_client_headers: true
     permissions:
       - role: user
-  - name: analyze_mood
+  - name: ai_twin_reply
     definition:
       kind: synchronous
-      handler: https://peevish-unberouged-campbell.ngrok-free.dev/actions/mood
+      handler: '{{ACTION_BASE_URL}}/twin'
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: arena
+    definition:
+      kind: synchronous
+      handler: '{{ACTION_BASE_URL}}/arena'
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: create_group
+    definition:
+      kind: synchronous
+      handler: '{{ACTION_BASE_URL}}/create_group'
       forward_client_headers: true
     permissions:
       - role: user
   - name: design_theme
     definition:
       kind: synchronous
-      handler: https://peevish-unberouged-campbell.ngrok-free.dev/actions/theme
+      handler: '{{ACTION_BASE_URL}}/theme'
       forward_client_headers: true
     permissions:
       - role: user
   - name: generate_summary
     definition:
       kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/summary
+      handler: '{{ACTION_BASE_URL}}/summary'
+      forward_client_headers: true
+    permissions:
+      - role: user
+  - name: load_app_data
+    definition:
+      kind: ""
+      handler: '{{ACTION_BASE_URL}}/load_app_data'
       forward_client_headers: true
     permissions:
       - role: user
   - name: login_user
     definition:
       kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/login
+      handler: '{{ACTION_BASE_URL}}/login'
       forward_client_headers: true
     permissions:
       - role: anonymous
@@ -38,57 +59,30 @@ actions:
   - name: matthu_query
     definition:
       kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/matthu
+      handler: '{{ACTION_BASE_URL}}/matthu'
       forward_client_headers: true
     permissions:
       - role: user
   - name: register_user
     definition:
       kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/register
+      handler: '{{ACTION_BASE_URL}}/register'
       forward_client_headers: true
     permissions:
       - role: anonymous
-      - role: user
-  - name: arena
-    definition:
-      kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/arena
-      forward_client_headers: true
-    permissions:
-      - role: user
-  - name: create_group
-    definition:
-      kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/create_group
-      forward_client_headers: true
-    permissions:
-      - role: user
-  - name: add_members
-    definition:
-      kind: synchronous
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/add_members
-      forward_client_headers: true
-    permissions:
-      - role: user
-  - name: load_app_data
-    definition:
-      kind: synchronous
-      type: query
-      handler: https://7j4nkfem6j.execute-api.ap-south-1.amazonaws.com/load_app_data
-      forward_client_headers: true
-    permissions:
       - role: user
 custom_types:
   enums: []
   input_objects:
     - name: RegisterInput
     - name: LoginInput
-    - name: MoodInput
     - name: SummaryInput
     - name: TwinInput
     - name: ThemeInput
     - name: MatthuInput
+    - name: ArenaInput
+    - name: CreateGroupInput
+    - name: AddMembersInput
   objects:
     - name: RegisterOutput
     - name: LoginOutput
@@ -97,4 +91,10 @@ custom_types:
     - name: TwinOutput
     - name: ThemeOutput
     - name: MatthuOutput
+    - name: ArenaOutput
+    - name: CreateGroupOutput
+    - name: AddMembersOutput
+    - name: LoadDataOutput
+    - name: UserProfile
+    - name: GroupSummary
   scalars: []

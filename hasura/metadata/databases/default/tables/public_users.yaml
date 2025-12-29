@@ -42,17 +42,16 @@ insert_permissions:
     permission:
       check: {}
       columns:
-        - email
         - display_name
-        - password_hash
+        - email
 select_permissions:
   - role: user
     permission:
       columns:
-        - id
-        - email
-        - display_name
         - created_at
+        - display_name
+        - email
+        - id
       filter:
         id:
           _eq: X-Hasura-User-Id
