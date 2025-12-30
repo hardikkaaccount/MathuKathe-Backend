@@ -24,10 +24,22 @@ insert_permissions:
   - role: user
     permission:
       check: {}
+      set:
+        created_by: x-hasura-user-id
       columns:
         - name
         - description
         - created_by
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - name
+        - description
+      filter:
+        created_by:
+          _eq: X-Hasura-User-Id
+      check: null
 select_permissions:
   - role: user
     permission:

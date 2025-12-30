@@ -43,7 +43,7 @@ actions:
       - role: user
   - name: load_app_data
     definition:
-      kind: ""
+      kind: synchronous
       handler: '{{ACTION_BASE_URL}}/load_app_data'
       forward_client_headers: true
     permissions:

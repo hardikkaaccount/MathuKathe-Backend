@@ -9,7 +9,9 @@ service: chatapp
 
 plugins:
   - serverless-dotenv-plugin
+  - serverless-offline
 
+# Environment variables
 
 provider:
   name: aws
@@ -18,11 +20,8 @@ provider:
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
-  environment:
-    HASURA_GRAPHQL_ID: ${env:HASURA_GRAPHQL_ID}
-    HASURA_ADMIN_SECRET: ${env:HASURA_ADMIN_SECRET}
-    HASURA_JWT_SECRET: ${env:HASURA_JWT_SECRET}
-    GOOGLE_API_KEY: ${env:gemini_api_key}
+
+#aws credentials
 
 
 functions:
