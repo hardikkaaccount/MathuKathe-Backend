@@ -1,6 +1,0 @@
-# - name: starwars
-#   definition:
-#     url: https://swapi-graphql.netlify.app/.netlify/functions/index
-#     timeout_seconds: 60
-#     customization: {}
-#   comment: starwars

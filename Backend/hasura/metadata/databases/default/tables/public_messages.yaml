@@ -1,0 +1,37 @@
+table:
+  name: messages
+  schema: public
+object_relationships:
+  - name: group
+    using:
+      foreign_key_constraint_on: group_id
+  - name: sender
+    using:
+      foreign_key_constraint_on: sender_id
+insert_permissions:
+  - role: user
+    permission:
+      check:
+        sender_id:
+          _eq: X-Hasura-User-Id
+      set:
+        sender_id: x-hasura-user-id
+      columns:
+        - group_id
+        - sender_id
+        - content
+        - mood
+        - metadata
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+        - group_id
+        - sender_id
+        - content
+        - mood
+        - metadata
+        - created_at
+      filter: {}
+      allow_aggregations: true
