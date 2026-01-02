@@ -33,12 +33,5 @@ select_permissions:
         - mood
         - metadata
         - created_at
-      filter:
-        _or:
-          - sender_id:
-              _eq: X-Hasura-User-Id
-          - group:
-              members:
-                user_id:
-                  _eq: X-Hasura-User-Id
+      filter: {}
       allow_aggregations: true

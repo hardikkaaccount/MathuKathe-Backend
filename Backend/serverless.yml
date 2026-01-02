@@ -23,7 +23,6 @@ provider:
 
 #aws credentials
 
-
 functions:
   matthu_query:
     handler: index.matthu_query

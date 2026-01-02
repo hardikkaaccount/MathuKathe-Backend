@@ -22,6 +22,18 @@ export const handler = apiHandler({ schema: matthuSchema }, async (event, contex
     // Business Logic
     const answer = await MatthuModel.answerQuestion(prompt, recentMessages);
 
+    // If a group_id is provided, insert the response into the chat
+    if (group_id) {
+        // ID of the "Mathu AI" user we created in seed
+        const MATHU_USER_ID = '00000000-0000-0000-0000-000000000001';
+        try {
+            await Message.create(group_id, MATHU_USER_ID, answer);
+        } catch (error) {
+            console.error("Failed to insert Mathu reply:", error);
+            // We continue even if insertion fails, to at least return the answer
+        }
+    }
+
     return {
         statusCode: 200,
         body: JSON.stringify({ answer }),

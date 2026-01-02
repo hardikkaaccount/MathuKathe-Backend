@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Settings, Plus, Loader2, LogOut } from "lucide-react";
+import { Settings, Plus, Loader2, LogOut, Globe, X } from "lucide-react";
 import { useQuery } from "@apollo/client";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/hooks/useAuth";
 import { GET_USER_GROUPS_QUERY } from "@/queries/chat";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
 
-export function Sidebar() {
+interface SidebarProps {
+    onClose?: () => void;
+}
+
+export function Sidebar({ onClose }: SidebarProps) {
     const { user, logout } = useAuth();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const location = useLocation();
@@ -19,14 +23,27 @@ export function Sidebar() {
 
     const groups = data?.group_members.map((gm: any) => gm.group) || [];
 
+    const handleLinkClick = () => {
+        if (onClose) onClose();
+    };
+
     return (
         <>
-            <aside className="w-64 bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 hidden md:flex flex-col">
-                <div className="p-4 h-14 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+            <aside className="w-full h-full bg-slate-50 dark:bg-slate-900 flex flex-col">
+                <div className="p-4 h-14 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 shrink-0">
                     <span className="font-bold text-xl text-indigo-600 dark:text-indigo-400">MathuKathe</span>
-                    <Link to="/profile" className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors" title="My Profile">
-                        <Settings className="w-5 h-5 text-slate-500" />
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <Link to="/profile" onClick={handleLinkClick} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors" title="My Profile">
+                            <Settings className="w-5 h-5 text-slate-500" />
+                        </Link>
+                        {/* Mobile Close Button */}
+                        <button
+                            onClick={onClose}
+                            className="p-1 md:hidden hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors"
+                        >
+                            <X className="w-5 h-5 text-slate-500" />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto py-4">
@@ -51,6 +68,7 @@ export function Sidebar() {
                                     <Link
                                         key={group.id}
                                         to={`/chat/${group.id}`}
+                                        onClick={handleLinkClick}
                                         className={cn(
                                             "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors text-sm font-medium",
                                             location.pathname === `/chat/${group.id}`
@@ -72,8 +90,33 @@ export function Sidebar() {
                     </div>
                 </div>
 
-                <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-                    <div className="flex items-center gap-3 mb-3">
+                <div className="p-4 border-t border-slate-200 dark:border-slate-800 space-y-4 shrink-0">
+                    {/* Community Link */}
+                    <Link
+                        to="/community"
+                        onClick={handleLinkClick}
+                        className={cn(
+                            "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 group",
+                            location.pathname === '/community'
+                                ? "bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-lg shadow-violet-500/25"
+                                : "bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300"
+                        )}
+                    >
+                        <div className={cn(
+                            "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                            location.pathname === '/community'
+                                ? "bg-white/20 text-white"
+                                : "bg-white dark:bg-slate-900 text-violet-500 group-hover:text-violet-600"
+                        )}>
+                            <Globe className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 text-left">
+                            <p className="text-sm font-bold">Explore Groups</p>
+                            <p className={cn("text-[10px] opacity-80", location.pathname === '/community' ? "text-violet-100" : "text-slate-500")}>Join new communities</p>
+                        </div>
+                    </Link>
+
+                    <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-medium text-xs">
                             {user?.name?.[0]?.toUpperCase() || "U"}
                         </div>

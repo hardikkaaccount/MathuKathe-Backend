@@ -40,9 +40,17 @@ export const SEND_MESSAGE_MUTATION = gql`
 `;
 
 export const CREATE_GROUP_MUTATION = gql`
-    mutation CreateGroup($name: String!) {
-        create_group(input: {name: $name}) {
+    mutation CreateGroup($name: String!, $members: [uuid!]) {
+        create_group(input: {name: $name, members: $members}) {
             group_id
+        }
+    }
+`;
+
+export const ADD_MEMBERS_ACTION_MUTATION = gql`
+    mutation AddMembersAction($group_id: uuid!, $members: [uuid!]!) {
+        add_members(input: {group_id: $group_id, members: $members}) {
+            added_count
         }
     }
 `;
@@ -113,6 +121,62 @@ export const GET_GROUP_DETAILS_QUERY = gql`
                     display_name
                 }
             }
+        }
+    }
+`;
+
+export const EXPLORE_GROUPS_QUERY = gql`
+    query ExploreGroups($search: String, $limit: Int, $user_id: uuid!) {
+        groups(
+            where: { name: { _ilike: $search } }
+            limit: $limit
+            order_by: { created_at: desc }
+        ) {
+            id
+            name
+            description
+            created_at
+            members_aggregate {
+                aggregate {
+                    count
+                }
+            }
+            am_i_member: members(where: {user_id: {_eq: $user_id}}) {
+                user_id
+            }
+        }
+    }
+`;
+
+export const MATTHU_QUERY = gql`
+    mutation MatthuQuery($prompt: String!, $group_id: uuid) {
+        matthu_query(input: {prompt: $prompt, group_id: $group_id}) {
+            answer
+        }
+    }
+`;
+
+export const GENERATE_SUMMARY_MUTATION = gql`
+    mutation GenerateSummary($group_id: uuid!, $from_date: String!, $to_date: String!) {
+        generate_summary(input: {group_id: $group_id, from_date: $from_date, to_date: $to_date}) {
+            summary
+        }
+    }
+`;
+
+export const AI_TWIN_REPLY_MUTATION = gql`
+    mutation AiTwinReply($group_id: uuid!) {
+        ai_twin_reply(input: {group_id: $group_id}) {
+            reply
+        }
+    }
+`;
+
+export const ARENA_MUTATION = gql`
+    mutation Arena($group_id: uuid!, $members: [uuid!]!) {
+        arena(input: {group_id: $group_id, members: $members}) {
+            challenger_id
+            player_id
         }
     }
 `;

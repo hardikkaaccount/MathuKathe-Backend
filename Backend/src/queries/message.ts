@@ -31,3 +31,17 @@ export const GET_RECENT_MESSAGES = `
         }
     }
 `;
+
+export const INSERT_MESSAGE_MUTATION = `
+    mutation InsertMessage($group_id: uuid!, $sender_id: uuid!, $content: String!) {
+        insert_messages_one(object: {
+            group_id: $group_id, 
+            sender_id: $sender_id, 
+            content: $content
+        }) {
+            id
+            content
+            created_at
+        }
+    }
+`;

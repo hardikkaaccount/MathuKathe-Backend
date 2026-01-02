@@ -1,0 +1,10 @@
+-- Could not auto-generate a down migration.
+-- Please write an appropriate down migration for the SQL below:
+-- TRUNCATE TABLE
+--     public.messages,
+--     public.group_members,
+--     public.moods,
+--     public.themes,
+--     public.groups,
+--     public.users
+-- RESTART IDENTITY CASCADE;

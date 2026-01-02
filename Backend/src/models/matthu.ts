@@ -15,7 +15,7 @@ export class MatthuModel {
                 `${msg.sender.display_name}: ${msg.content}`
             ).join('\n');
 
-            fullPrompt = `Context from recent chat history:\n${context}\n\nUser Question: ${prompt}`;
+            fullPrompt = `Context from recent chat history:\n${context}\n\nUser Question: ${prompt}\n\nPlease keep your response concise (max 50 words).`;
         }
 
         return await generateContent(fullPrompt);

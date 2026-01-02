@@ -24,11 +24,5 @@ select_permissions:
         - user_id
         - role
         - joined_at
-      filter:
-        _or:
-          - user_id:
-              _eq: X-Hasura-User-Id
-          - group:
-              members:
-                user_id:
-                  _eq: X-Hasura-User-Id
+      filter: {}
+      allow_aggregations: true
